@@ -15,12 +15,8 @@ namespace Snake
             gameField.PrintFieldN1();
             snake.test();
            
-           // snake.InitMove();
-
-            //for (int i=0; i<2;i++)
-            //{
-            //    i = 0;
-            //}
+            snake.InitMove();
+          
         }
     }
 }
