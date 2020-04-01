@@ -4,15 +4,14 @@ using System.Text;
 
 namespace Snake
 {
-    class SnakeNode : Point
+    class FoodNode : Point
     {
-        public char symbol = 'o';
-        public SnakeNode(Vector2 vector2)
+        
+        public FoodNode(Vector2 vector2, char ch)
         {
             this.xCoords = vector2.X;
             this.yCoords = vector2.Y;
-            this.charSymbol = symbol;           
+            this.charSymbol = ch;
         }
-        
     }
 }
