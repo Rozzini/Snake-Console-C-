@@ -18,10 +18,10 @@ namespace Snake
         }
 
         public WallType wallType; 
-        public Brick(int x, int y, WallType type)
+        public Brick(Vector2 vector2, WallType type)
         {
-            this.xCoords = x;
-            this.yCoords = y;
+            this.xCoords = vector2.X;
+            this.yCoords = vector2.Y;
             this.charSymbol = (char)type;
             this.wallType = type;
         }

@@ -4,20 +4,23 @@ using System.Text;
 
 namespace Snake
 {
+    public interface SnakeDelegate
+    {
+        bool CanMoveTo(Vector2 point);
+    }
+
     class Snake
     {
         public bool isDead = false;
-        public int SnakeLenght = 14;
+        public bool notEaten = true;
+        public int SnakeLenght = 3;
         private int headCoordX = 0;
         private int headCoordY = 0;
         List<SnakeNode> snakeNodes = new List<SnakeNode>();
+        public SnakeDelegate Delegate;
 
+        Vector2 velocity = new Vector2(1, 0);
 
-
-        public void AAA()
-        {
-            Console.WriteLine("Nodes count: " + snakeNodes.Count);           
-        }
         public int HeadCoordX
         {
             get
@@ -50,14 +53,13 @@ namespace Snake
             
             for(int i=0; i< SnakeLenght; i++)
             {
-                SnakeNode snakeNode = new SnakeNode(HeadCoordX-i, HeadCoordY);
+                SnakeNode snakeNode = new SnakeNode(new Vector2(HeadCoordX-i, HeadCoordY));
                 snakeNodes.Add(snakeNode);
             }
-
           
         }
 
-        public void test()
+        public void Draw()
         {
             foreach(var node in snakeNodes)
             {
@@ -65,74 +67,123 @@ namespace Snake
             }
         }
 
-        public void InitMove()
-        {
-            int tempX = 0;
-            int tempY = 0;
-            int dx = 1;
-            int dy = 0;            
-            int delayInMillisecs = 300;
-            do
+        public bool IntersectWith(Vector2 Point)
+        {            
+            foreach(var item in snakeNodes)
             {
-                if (Console.KeyAvailable)
+                if(item.xCoords == Point.X && item.yCoords == Point.Y)
                 {
-                    ConsoleKeyInfo key = Console.ReadKey();
-                    switch (key.Key)
-                    {
-                        case ConsoleKey.UpArrow:
-                            {
-                                dx = 0;
-                                dy = -1;
-                                break;
-                            }
-                        case ConsoleKey.DownArrow:
-                            {
-                                dx = 0;
-                                dy = 1;
-                                break;
-                            }
-                        case ConsoleKey.LeftArrow:
-                            {
-                                dx = -1;
-                                dy = 0;
-                                break;
-                            }
-                        case ConsoleKey.RightArrow:
-                            {
-                                dx++;
-                                dy = 0;
-                                break;
-                            }
-                    }
-                }                
+                    return true;
+                }
+            }
+            return false;
+        }
 
-                tempX = snakeNodes[snakeNodes.Count - 1].xCoords;
-                tempY = snakeNodes[snakeNodes.Count - 1].yCoords;
+        public void InitMove()
+        {                        
+            Vector2 temp = new Vector2(1, 0);
+           
+            DetectMove();
+            if (this.Delegate.CanMoveTo(new Vector2(snakeNodes[0].xCoords + velocity.X, snakeNodes[0].yCoords + velocity.Y)))
+            {
+                temp.X = snakeNodes[snakeNodes.Count - 1].xCoords;
+                temp.Y = snakeNodes[snakeNodes.Count - 1].yCoords;
 
-                snakeNodes[0].xCoords += dx;
-                snakeNodes[0].yCoords += dy;
+                snakeNodes[0].xCoords += velocity.X;
+                snakeNodes[0].yCoords += velocity.Y;
 
-                for (int i = snakeNodes.Count-1; i >=1; i--)
+                if(Food.vec.X == snakeNodes[0].xCoords && Food.vec.Y == snakeNodes[0].yCoords)
                 {
-                   snakeNodes[i].xCoords = snakeNodes[i-1].xCoords;
-                   snakeNodes[i].yCoords = snakeNodes[i-1].yCoords;                  
+                    SnakeNode snakeNode = new SnakeNode(new Vector2(snakeNodes[snakeNodes.Count - 1].xCoords, snakeNodes[snakeNodes.Count - 2].yCoords));
+                    notEaten = false;
+                    snakeNodes.Add(snakeNode);
+                    this.SnakeLenght++;
                 }
 
-                snakeNodes[1].xCoords = snakeNodes[0].xCoords - dx;
-                snakeNodes[1].yCoords = snakeNodes[0].yCoords - dy;
+                for (int i = snakeNodes.Count - 1; i >= 1; i--)
+                { 
+                    snakeNodes[i].xCoords = snakeNodes[i - 1].xCoords;
+                    snakeNodes[i].yCoords = snakeNodes[i - 1].yCoords;
+                }
 
-                Brick brick = new Brick(tempX, tempY, Brick.WallType.Del);
+                snakeNodes[1].xCoords = snakeNodes[0].xCoords - velocity.X;
+                snakeNodes[1].yCoords = snakeNodes[0].yCoords - velocity.Y;
 
+                //TODO: remove
+                Brick brick = new Brick(new Vector2(temp.X, temp.Y), Brick.WallType.Del);
                 brick.Draw();
-
-                foreach (var node in snakeNodes)
-                    {
-                        node.Draw();
-                    }
-                    System.Threading.Thread.Sleep(delayInMillisecs);
-                
-            } while (isDead == false);
+            }
+            else
+            {
+                isDead = true;
+            }
         }
-       
+
+        public void WinCodition(int x, int y, int score)
+        {
+            if(score == 1000)
+            {
+                Console.SetCursorPosition(x, y);
+                Console.WriteLine("YOU WIN");
+            }
+            if (isDead == true)
+            {
+                Console.SetCursorPosition(x, y);
+                Console.WriteLine("Death");
+            }
+            Console.ReadKey();
+        }
+
+        private void DetectMove()
+        {
+           
+            if (Console.KeyAvailable)
+            {
+                ConsoleKeyInfo key = Console.ReadKey();
+                switch (key.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        {
+                            if (velocity.X == 1 || velocity.X == -1)
+                            {                               
+                                velocity.UPDVector(0, -1);
+                                break;
+                            }
+                            break;
+                        }
+                    case ConsoleKey.DownArrow:
+                        {
+                            if(velocity.X == 1 || velocity.X == -1)
+                            {
+                               
+                                velocity.UPDVector(0, 1);
+                                break;
+                            }                            
+                            break;
+                        }
+                    case ConsoleKey.LeftArrow:
+                        {
+                            if(velocity.Y == 1 || velocity.Y == -1)
+                            {
+                                
+                                velocity.UPDVector(-1, 0);
+                                break;
+                            }
+                            break;
+                        }
+                    case ConsoleKey.RightArrow:
+                        {
+                            if(velocity.Y == 1 || velocity.Y == -1)
+                            {
+                                
+                                velocity.UPDVector(1, 0);
+                                break;
+                            }
+                            break;
+                        }
+                }
+            }
+        }
+
     }
 }
