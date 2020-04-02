@@ -4,9 +4,13 @@ using System.Text;
 
 namespace Snake
 {
-    public interface SnakeDelegate
+    public interface ISnakeResponder
     {
         bool CanMoveTo(Vector2 point);
+
+        bool CanEatAt(Vector2 point);
+
+        void FoodDidEaten();
     }
 
     class Snake
@@ -16,9 +20,9 @@ namespace Snake
         public int SnakeLenght = 3;
         private int headCoordX = 0;
         private int headCoordY = 0;
-        List<SnakeNode> snakeNodes = new List<SnakeNode>();
-        public SnakeDelegate Delegate;
-
+        public static List<SnakeNode> snakeNodes = new List<SnakeNode>();
+        public ISnakeResponder Delegate;
+        public static Vector2 TracksDeleter = new Vector2(1, 0);
         Vector2 velocity = new Vector2(1, 0);
 
         public int HeadCoordX
@@ -51,12 +55,11 @@ namespace Snake
             HeadCoordX = x;
             HeadCoordY = y;          
             
-            for(int i=0; i< SnakeLenght; i++)
+            for(int i=0; i< SnakeLenght - 1; i++)
             {
                 SnakeNode snakeNode = new SnakeNode(new Vector2(HeadCoordX-i, HeadCoordY));
-                snakeNodes.Add(snakeNode);
+                snakeNodes.Add(snakeNode);               
             }
-          
         }
 
         public void Draw()
@@ -80,22 +83,23 @@ namespace Snake
         }
 
         public void InitMove()
-        {                        
-            Vector2 temp = new Vector2(1, 0);
+        {                                   
            
             DetectMove();
             if (this.Delegate.CanMoveTo(new Vector2(snakeNodes[0].xCoords + velocity.X, snakeNodes[0].yCoords + velocity.Y)))
             {
-                temp.X = snakeNodes[snakeNodes.Count - 1].xCoords;
-                temp.Y = snakeNodes[snakeNodes.Count - 1].yCoords;
+                TracksDeleter.X = snakeNodes[snakeNodes.Count - 1].xCoords;
+                TracksDeleter.Y = snakeNodes[snakeNodes.Count - 1].yCoords;
 
                 snakeNodes[0].xCoords += velocity.X;
                 snakeNodes[0].yCoords += velocity.Y;
 
-                if(Food.vec.X == snakeNodes[0].xCoords && Food.vec.Y == snakeNodes[0].yCoords)
+                GameField.Score();
+
+                if (Delegate.CanEatAt(new Vector2(snakeNodes[0].xCoords, snakeNodes[0].yCoords)))
                 {
                     SnakeNode snakeNode = new SnakeNode(new Vector2(snakeNodes[snakeNodes.Count - 1].xCoords, snakeNodes[snakeNodes.Count - 2].yCoords));
-                    notEaten = false;
+                    Delegate.FoodDidEaten();
                     snakeNodes.Add(snakeNode);
                     this.SnakeLenght++;
                 }
@@ -108,9 +112,9 @@ namespace Snake
 
                 snakeNodes[1].xCoords = snakeNodes[0].xCoords - velocity.X;
                 snakeNodes[1].yCoords = snakeNodes[0].yCoords - velocity.Y;
-
-                //TODO: remove
-                Brick brick = new Brick(new Vector2(temp.X, temp.Y), Brick.WallType.Del);
+               
+            //TODO: remove
+                Brick brick = new Brick(new Vector2(TracksDeleter.X, TracksDeleter.Y), Brick.WallType.Del);
                 brick.Draw();
             }
             else

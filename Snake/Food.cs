@@ -4,22 +4,33 @@ using System.Text;
 
 namespace Snake
 {
+    public interface IFoodResponder
+    {
+        public bool CanPlaceTo(Vector2 point);
+    }
+
     class Food
     {
-        static public char Symbol = '¶';
-        static public Vector2 vec;
-        public Food(Vector2 vector2/*, char ch*/)
+        static public char Symbol = '¤';
+        public Vector2 Coords;
+        public IFoodResponder Delegate;
+
+        private FoodNode FoodNode;
+        public Food(Vector2 vector2)
         {
-            vec = vector2;
-            //Symbol = ch;
-            FoodNode foodNode = new FoodNode(vector2, Symbol);
-            foodNode.Draw();
+            Coords = vector2;
+            FoodNode = new FoodNode(vector2, Symbol);
         }
 
-        public bool IntersectFood(Vector2 Point)
+        public void Draw()
         {
-            bool XPred = Point.X <= vec.X && Point.X >= vec.X;
-            bool YPred = Point.Y <= vec.Y && Point.Y >= vec.Y;
+            FoodNode.Draw();
+        }
+
+        public bool IntersectWith(Vector2 Point)
+        {
+            bool XPred = Point.X == Coords.X;
+            bool YPred = Point.Y == Coords.Y;
 
             return XPred && YPred;
         }

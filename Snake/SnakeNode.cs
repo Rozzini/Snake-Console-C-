@@ -6,7 +6,7 @@ namespace Snake
 {
     class SnakeNode : Point
     {
-        public char symbol = 'o';
+        public char symbol = '█';
         public SnakeNode(Vector2 vector2)
         {
             this.xCoords = vector2.X;

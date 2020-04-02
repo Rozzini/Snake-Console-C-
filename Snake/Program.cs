@@ -7,20 +7,13 @@ namespace Snake
        
         static void Main(string[] args)
         {
-            int FieldWidth = 80;
-            int FieldHight = 30;
+            int FieldWidth = 15;
+            int FieldHight = 8;
             Console.CursorVisible = false;
             GameField gameField = new GameField(FieldWidth, FieldHight);
 
             gameField.Start();
-          
-            //snake.InitMove(FieldWidth, FieldHight);
-
-            //snake.WinCodition(FieldWidth / 2, FieldHight / 2);
-            //for (int i=0; i<2;i++)
-            //{
-            //    i = 0;
-            //}
+                     
         }
     }
 }

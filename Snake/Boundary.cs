@@ -8,20 +8,25 @@ namespace Snake
     {
 
         public Vector2 Origin;
+        public Brick.WallType Type;
         public int Width;
         public int Hight;
-
-
-        public Boundary(Vector2 vector2, int width, int hight, Brick.WallType type)
+  
+        public Boundary(Vector2 origin, int width, int hight, Brick.WallType type)
         {
-            Origin = vector2;
+            Origin = origin;
+            Type = type;
             Width = width;
             Hight = hight;
-            for(int i = vector2.X; i <=(width+vector2.X); i++)
+        }
+
+        public void Draw()
+        {
+            for (int i = Origin.X; i <= (Width + Origin.X); i++)
             {
-                for(int j = vector2.Y; j<=(hight+vector2.Y); j++)
+                for (int j = Origin.Y; j <= (Hight + Origin.Y); j++)
                 {
-                    Brick brick = new Brick(new Vector2(i,j), type);
+                    Brick brick = new Brick(new Vector2(i, j), Type);
                     brick.Draw();
                 }
             }

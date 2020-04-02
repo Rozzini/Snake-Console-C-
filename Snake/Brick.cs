@@ -22,8 +22,31 @@ namespace Snake
         {
             this.xCoords = vector2.X;
             this.yCoords = vector2.Y;
-            this.charSymbol = (char)type;
-            this.wallType = type;
+            if (vector2.X == 0 && vector2.Y == 0)
+            {
+                this.wallType = WallType.LeftTopCorner;
+                this.charSymbol = (char)this.wallType;
+            }
+            else if (vector2.X == 0 && vector2.Y == GameField.Height)
+            {
+                this.wallType = WallType.LeftBotCorner;
+                this.charSymbol = (char)this.wallType;
+            }
+            else if (vector2.X == GameField.Width && vector2.Y == 0)
+            {
+                this.wallType = WallType.RightTopCorner;
+                this.charSymbol = (char)this.wallType;
+            }
+            else if (vector2.X == GameField.Width && vector2.Y == GameField.Height)
+            {
+                this.wallType = WallType.RightBotCorner;
+                this.charSymbol = (char)this.wallType;
+            }
+            else
+            {
+                this.charSymbol = (char)type;
+                this.wallType = type;
+            }
         }
                
         
